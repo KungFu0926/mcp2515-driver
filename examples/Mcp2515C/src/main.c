@@ -4,32 +4,45 @@
  * @author ZhengKF (minchen9292@gmail.com)
  */
 /* SELECT MODE */
-#define SEND_MODE
+// #define SEND_MODE
 // #define READ_MODE
 // #define IRQ_MODE
-// #define TEST_MODE
+#define TEST_MODE
 
 #include <stdio.h>
 #include "libopencm3/cm3/nvic.h"
 #include "libopencm3/stm32/exti.h"
+#include "libopencm3/stm32/gpio.h"
 #include "mcp2515.h"
+#include <libopencm3/stm32/usart.h>
 
 #include "mcp2515_communication.h"
+#include "default_mode.h"
 
 mcp2515_handle_t mcp2515;
-
 can_frame_t Receieve_frame;
 int SendTimes = 0;
+volatile uint32_t systick_delay = 0;
+
+void delay_ms(uint32_t ms)
+{
+  systick_delay = ms;
+  while (systick_delay != 0)
+  {
+    /* Wait. */
+  }
+}
 
 int main(void)
 {
+  default_mode_start_up();
+
   mcp2515_setup();
-  usart2_setup();
-      printf("INIT SUCCESS\r\n");
   mcp2515_make_handle(&mcp2515_select, &mcp2515_deselect, &mcp2515_spi_transfer, &mcp2515_delay_ms, &mcp2515);
+
   if (mcp2515_init(&mcp2515))
   {
-    printf("INIT SUCCESS\r\n");
+    printf("INIT SUCCESS\n");
   }
 
   while (1)
@@ -42,11 +55,11 @@ int main(void)
     }
     mcp2515_sendMessage(&mcp2515, &tx_frame_1);
     mcp2515_print_can_frame(tx_frame_1);
-    mcp2515_delay_ms(100);
+    mcp2515_delay_ms(1000);
 
     mcp2515_sendMessage(&mcp2515, &tx_frame_2);
     mcp2515_print_can_frame(tx_frame_2);
-    mcp2515_delay_ms(100);
+    mcp2515_delay_ms(1000);
     SendTimes += 1;
 #elif defined(READ_MODE)
     if (mcp2515_readMessage(&mcp2515, &Receieve_frame) == ERROR_OK)
@@ -70,7 +83,8 @@ int main(void)
     /* 此模式全部再exti裡面完成，主程式不會需要任何程式 */
 
 #elif defined(TEST_MODE)
-
+    mcp2515_print_can_frame(tx_frame_1);
+    printf("\n");
 #endif
   }  // while(1)
 }  // main
@@ -114,4 +128,15 @@ void exti9_5_isr(void)
     printf("\r\n");
   }
   exti_reset_request(INT_EXTI);
+}
+
+/**
+ * @brief SysTick handler.
+ */
+void sys_tick_handler(void)
+{
+  if (systick_delay != 0)
+  {
+    systick_delay--;
+  }
 }

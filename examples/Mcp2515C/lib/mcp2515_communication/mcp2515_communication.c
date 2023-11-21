@@ -11,57 +11,14 @@
 void spi_setup(void);
 void int_pin_setup(void);
 
-void usart2_setup(void)
+void mcp2515_setup()
 {
-  rcc_periph_clock_enable(RCC_USART2_TXRX_PORT);
-  rcc_periph_clock_enable(RCC_ENABLE_USART2);
-  /* Set USART-Tx pin to alternate function. */
-  gpio_mode_setup(USART2_TXRX_PORT,
-                  GPIO_MODE_AF,
-                  GPIO_PUPD_NONE,
-                  GPIO_USART2_TX_PIN | GPIO_USART2_RX_PIN);
-
-  gpio_set_af(USART2_TXRX_PORT,
-              GPIO_USART2_AF,
-              GPIO_USART2_TX_PIN | GPIO_USART2_RX_PIN);
-
-  /* Setup interrupt. */
-  nvic_enable_irq(NVIC_USART2_IRQ);
-  usart_enable_rx_interrupt(USART2); /* Enable receive interrupt. */
-
-  /* Config USART params. */
-  usart_set_baudrate(USART2, USART_BAUDRATE);
-  usart_set_databits(USART2, 8);
-  usart_set_stopbits(USART2, USART_STOPBITS_1);
-  usart_set_parity(USART2, USART_PARITY_NONE);
-  usart_set_flow_control(USART2, USART_FLOWCONTROL_NONE);
-  usart_set_mode(USART2, USART_MODE_TX_RX);
-
-  usart_enable(USART2);
-}
-
-/* For printf(). */
-int _write(int file, char *ptr, int len)
-{
-  int i;
-  if (file == 1)
-  {
-    for (i = 0; i < len; i++)
-    {
-      usart_send_blocking(USART2, ptr[i]);
-    }
-    return i;
-  }
-  errno = EIO;
-  return -1;
+  spi_setup();
+  int_pin_setup();
 }
 
 void spi_setup(void)
 {
-  /*FOR SPI*/
-  rcc_clock_setup_pll(&rcc_hse_8mhz_3v3[RCC_CLOCK_3V3_168MHZ]);
-  rcc_periph_clock_enable(RCC_GPIOA);
-  rcc_periph_clock_enable(RCC_GPIOC);
   rcc_periph_clock_enable(RCC_SPI1);
   rcc_periph_clock_enable(RCC_SYSCFG); /* For EXTI. */
 
@@ -95,11 +52,7 @@ void int_pin_setup(void)
   exti_enable_request(INT_EXTI);
   nvic_enable_irq(INT_IRQ);
 }
-void mcp2515_setup()
-{
-  spi_setup();
-  int_pin_setup();
-}
+
 void mcp2515_deselect()
 {
   while (!(SPI_SR(SPI1) &
@@ -197,14 +150,17 @@ bool mcp2515_init(const mcp2515_handle_t *mcp2515_handle)
   {
     if (mcp2515_reset(mcp2515_handle) != ERROR_OK)
     {
+      printf("Mcp2515_Reset FAILED\n");
       continue;
     }
     if (mcp2515_setBitrate(mcp2515_handle, CAN_125KBPS, MCP_8MHZ) != ERROR_OK)
     {
+      printf("Mcp2515_setBitrate FAILED\n");
       continue;
     }
     if (mcp2515_setNormalMode(mcp2515_handle) != ERROR_OK)
     {
+      printf("Mcp2515_setNormalMode FAILED\n");
       continue;
     }
     return true;
