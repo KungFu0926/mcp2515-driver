@@ -2,12 +2,12 @@
  * @file default_mode.h
  * @brief Provide a sample for STM32 nucleo F446RE develope with
  *        1. Rcc in 168MHz (using "HSE")
- *        2. System tick (for delay)
+ *        2. timer4 (for delay)
  *        3. usart2 TX & RX
  *        4. LED
  *        5. SWO
- *        All you have to do is call "default_mode_start_up()"" to enable the
- *        default mode.
+ *        All you have to do is call "default_mode_start_up()" to enable the
+ *        default mode, and copy the "tim4_isr(void)" to main to enable the delay function.
  * @author ZhengKF (nfu202208@gmail.com)
  * @copyright MIT License.
  */
@@ -19,32 +19,32 @@
   #define GPIO_LED_PORT (GPIOA)
   #define GPIO_LED_PIN (GPIO5) /* D13. */
 
+typedef enum
+{
+  S,
+  MS,
+  US,
+} delayUnit;
+
 void default_mode_start_up(void);
 
 int _write(int file, char *ptr, int len);
 uint32_t ITM_SendChar(uint32_t ch);
+void delay(uint32_t value, delayUnit unit);
 
+extern volatile uint32_t counter;
 #endif
 
-/*------------------------- below is systemtick_delay -------------------------*/
-// volatile uint32_t systick_delay = 0;
+/*------------------------- below is timer4_delay -------------------------*/
 
-// void delay_ms(uint32_t ms)
-// {
-//   systick_delay = ms;
-//   while (systick_delay != 0)
-//   {
-//     /* Wait. */
-//   }
-// }
+// volatile uint32_t counter = 0;
 
-// /**
-//  * @brief SysTick handler.
-//  */
-// void sys_tick_handler(void)
+// void tim4_isr(void)
 // {
-//   if (systick_delay != 0)
+//   /* Check 'Update interrupt flag'. */
+//   counter += 1;
+//   if (timer_get_flag(TIM4, TIM_SR_UIF))
 //   {
-//     systick_delay--;
+//     timer_clear_flag(TIM4, TIM_SR_UIF);
 //   }
 // }

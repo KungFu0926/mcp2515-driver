@@ -6,20 +6,17 @@
 #include <libopencm3/cm3/itm.h>
 #include <libopencm3/stm32/dbgmcu.h>
 #include <libopencm3/stm32/usart.h>
+#include <libopencm3/stm32/timer.h>
 
 #include "default_mode.h"
 
 #define TPIU_SPPR_MASK (0x3)
 
-#define ETM_BASE (PPBI_BASE + 0x41000)
-#define ETM_CR MMIO32(ETM_BASE + 0x000)
-#define ETM_SR MMIO32(ETM_BASE + 0x010)
-#define ETM_TER MMIO32(ETM_BASE + 0x008)
-#define ETM_TECR MMIO32(ETM_BASE + 0x01C)
-#define ETM_TEER MMIO32(ETM_BASE + 0x020)
-#define ETM_TSTART_OR_STOPR MMIO32(ETM_BASE + 0x024)
-
 #define USART_BAUDRATE (115200)
+
+#define ORIGINAL_TIMER4_CLOCK (rcc_apb1_frequency * 2)  //  84MHZ
+#define TIMER4_PRESCALER (84)                           // clock is devided into 1MHZ.1sec happen 1M times
+#define TIMER4_ARR (1)                                  // Mean it will generate a overflow when system finish one time.
 
 /*--------------------Here for SWO_setup----------------------*/
 void swo_enable(void);
@@ -27,19 +24,18 @@ void swo_gpio_setup(void);
 void dbg_setup(void);
 void tpiu_setup(void);
 void itm_setup(void);
-void etm_setup(void);
 
 /*--------------------Here for common tools---------------------*/
 void rcc_setup(void);
 void led_setup(void);
-void systick_setup(void);
+void timer4_setup(void);
 void usart2_setup(void);
 
 void default_mode_start_up()
 {
   rcc_setup();
+  timer4_setup();
   led_setup();
-  systick_setup();
   swo_enable();
   usart2_setup();
 }
@@ -57,22 +53,34 @@ void rcc_setup(void)
   rcc_periph_clock_enable(RCC_GPIOA);
   rcc_periph_clock_enable(RCC_GPIOB);
   rcc_periph_clock_enable(RCC_GPIOC);
+
+  rcc_periph_clock_enable(RCC_TIM4);
+  rcc_periph_reset_pulse(RST_TIM4); /* Reset TIM4 to defaults. */
 }
 
+void timer4_setup(void)
+{
+  timer_set_mode(TIM4,
+                 TIM_CR1_CKD_CK_INT,
+                 TIM_CR1_CMS_EDGE,
+                 TIM_CR1_DIR_UP);
+  timer_disable_preload(TIM4);
+  timer_continuous_mode(TIM4);
+
+  timer_set_prescaler(TIM4, TIMER4_PRESCALER); /* Setup TIMx_PSC register. */
+  timer_set_period(TIM4, TIMER4_ARR);          /* Setup TIMx_ARR register. */
+
+  /* Setup interrupt. */
+  timer_enable_irq(TIM4, TIM_DIER_UIE); /* Select 'UI (Update interrupt)'. */
+  nvic_enable_irq(NVIC_TIM4_IRQ);
+
+  timer_enable_counter(TIM4);
+}
 void led_setup(void)
 {
   /* Set LED pin to output push-pull. */
-  gpio_mode_setup(GPIOA, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO5);
-  gpio_set_output_options(GPIOA, GPIO_OTYPE_PP, GPIO_OSPEED_2MHZ, GPIO5);
-}
-
-void systick_setup(void)
-{
-  systick_set_clocksource(STK_CSR_CLKSOURCE_AHB_DIV8);
-  systick_set_reload(rcc_ahb_frequency / 8 / 1000 - 1);
-
-  systick_counter_enable();
-  systick_interrupt_enable();
+  gpio_mode_setup(GPIO_LED_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO_LED_PIN);
+  gpio_set_output_options(GPIO_LED_PORT, GPIO_OTYPE_PP, GPIO_OSPEED_2MHZ, GPIO_LED_PIN);
 }
 
 void swo_enable()
@@ -180,14 +188,6 @@ void itm_setup()
   ITM_TPR |= (0x1 << 0);
 }
 
-void etm_setup()
-{
-  ETM_CR |= (0x00001D1E);
-  ETM_TER |= (0x0000406F);
-  ETM_TEER |= (0x0000006F);
-  ETM_TSTART_OR_STOPR |= (0x00000001);
-  ETM_CR |= (0x0000191E);
-}
 
 /*
   For printf().
@@ -248,3 +248,60 @@ void usart2_setup(void)
 
   usart_enable(USART2);
 }
+
+void delay(uint32_t value, delayUnit unit)
+{
+  /*
+    This variable is increase by ARR(Counter)
+    and the velocity is base on system clock
+  */
+  counter = 0;
+
+  switch (unit)
+  {
+    case S:
+
+      while (counter < (value * 1e6))
+      {
+        __asm__("nop"); /* Do nothing */
+      }
+
+      break;
+    case MS:
+
+      while (counter < (value * 1e3))
+      {
+        __asm__("nop"); /* Do nothing */
+      }
+      break;
+    case US:
+
+      while (counter < (value * 1))
+      {
+        __asm__("nop"); /* Do nothing. */
+      }
+      break;
+  }
+}
+
+
+
+/*-----------------------------unuse---------------------------------*/
+// #define ETM_BASE (PPBI_BASE + 0x41000)
+// #define ETM_CR MMIO32(ETM_BASE + 0x000)
+// #define ETM_SR MMIO32(ETM_BASE + 0x010)
+// #define ETM_TER MMIO32(ETM_BASE + 0x008)
+// #define ETM_TECR MMIO32(ETM_BASE + 0x01C)
+// #define ETM_TEER MMIO32(ETM_BASE + 0x020)
+// #define ETM_TSTART_OR_STOPR MMIO32(ETM_BASE + 0x024)
+
+// void etm_setup(void);
+
+// void etm_setup()
+// {
+//   ETM_CR |= (0x00001D1E);
+//   ETM_TER |= (0x0000406F);
+//   ETM_TEER |= (0x0000006F);
+//   ETM_TSTART_OR_STOPR |= (0x00000001);
+//   ETM_CR |= (0x0000191E);
+// }

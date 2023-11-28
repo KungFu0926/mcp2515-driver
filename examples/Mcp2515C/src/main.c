@@ -13,25 +13,18 @@
 #include "libopencm3/cm3/nvic.h"
 #include "libopencm3/stm32/exti.h"
 #include "libopencm3/stm32/gpio.h"
-#include "mcp2515.h"
+#include<libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/usart.h>
 
+#include "mcp2515.h"
 #include "mcp2515_communication.h"
 #include "default_mode.h"
 
 mcp2515_handle_t mcp2515;
 can_frame_t Receieve_frame;
 int SendTimes = 0;
-volatile uint32_t systick_delay = 0;
 
-void delay_ms(uint32_t ms)
-{
-  systick_delay = ms;
-  while (systick_delay != 0)
-  {
-    /* Wait. */
-  }
-}
+volatile uint32_t counter = 0;
 
 int main(void)
 {
@@ -83,8 +76,8 @@ int main(void)
     /* 此模式全部再exti裡面完成，主程式不會需要任何程式 */
 
 #elif defined(TEST_MODE)
-    mcp2515_print_can_frame(tx_frame_1);
-    printf("\n");
+    // mcp2515_print_can_frame(tx_frame_1);
+    // printf("\n");
 #endif
   }  // while(1)
 }  // main
@@ -130,13 +123,13 @@ void exti9_5_isr(void)
   exti_reset_request(INT_EXTI);
 }
 
-/**
- * @brief SysTick handler.
- */
-void sys_tick_handler(void)
+
+void tim4_isr(void)
 {
-  if (systick_delay != 0)
+  /* Check 'Update interrupt flag'. */
+  counter += 1;
+  if (timer_get_flag(TIM4, TIM_SR_UIF))
   {
-    systick_delay--;
+    timer_clear_flag(TIM4, TIM_SR_UIF);
   }
 }
