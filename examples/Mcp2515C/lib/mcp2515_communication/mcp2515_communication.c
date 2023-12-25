@@ -22,13 +22,14 @@ void spi_setup(void)
   rcc_periph_clock_enable(RCC_SPI1);
   rcc_periph_clock_enable(RCC_SYSCFG); /* For EXTI. */
 
-  gpio_mode_setup(RCC_SPI_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, SPI_CS_PIN);
   gpio_mode_setup(RCC_SPI_PORT, GPIO_MODE_AF, GPIO_PUPD_NONE, SPI_SCK_PIN | SPI_MISO_PIN | SPI_MOSI_PIN);
-  gpio_set_af(RCC_SPI_PORT, SPI_AF,
-              SPI_SCK_PIN | SPI_MISO_PIN | SPI_MOSI_PIN);  //
-  gpio_set_output_options(RCC_SPI_PORT, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ,
-                          SPI_SCK_PIN | SPI_MOSI_PIN | SPI_CS_PIN);  //
-  gpio_set(RCC_SPI_PORT, SPI_CS_PIN);                                /* Deselect. */
+  gpio_set_af(RCC_SPI_PORT, SPI_AF, SPI_SCK_PIN | SPI_MISO_PIN | SPI_MOSI_PIN);
+  gpio_set_output_options(RCC_SPI_PORT, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ, SPI_SCK_PIN | SPI_MOSI_PIN);
+
+  gpio_mode_setup(RCC_SPI_CS_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, SPI_CS_PIN);
+  gpio_set_output_options(RCC_SPI_CS_PORT, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ, SPI_CS_PIN);
+  gpio_set(RCC_SPI_CS_PORT, SPI_CS_PIN); /* Deselect. */
+
   uint32_t spi = SPI1;
   spi_disable(spi);
   spi_reset(spi);
@@ -62,12 +63,12 @@ void mcp2515_deselect()
   while ((SPI_SR(SPI1) & SPI_SR_BSY)) /* Wait for 'Busy' flag to reset. */
   {
   }
-  gpio_set(RCC_SPI_PORT, SPI_CS_PIN); /* CS pin output high to deselect. */
+  gpio_set(RCC_SPI_CS_PORT, SPI_CS_PIN); /* CS pin output high to deselect. */
 }
 
 void mcp2515_select()
 {
-  gpio_clear(RCC_SPI_PORT, SPI_CS_PIN); /* CS pin output low to select. */
+  gpio_clear(RCC_SPI_CS_PORT, SPI_CS_PIN); /* CS pin output low to select. */
 }
 
 uint8_t mcp2515_spi_transfer(uint8_t data)

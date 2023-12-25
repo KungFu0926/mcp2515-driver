@@ -16,10 +16,12 @@
 
 /* SPI1 */
 #define RCC_SPI_PORT (GPIOA)
+#define RCC_SPI_CS_PORT (GPIOB)
+
 #define SPI_SCK_PIN (GPIO5)  /* Arduino-D13 pin. */
 #define SPI_MISO_PIN (GPIO6) /* Arduino-D12 pin. */
 #define SPI_MOSI_PIN (GPIO7) /* Arduino-D11 pin. */
-#define SPI_CS_PIN (GPIO9)   /* Arduino-D8 pin. */
+#define SPI_CS_PIN (GPIO6)   /* Arduino-D10 pin. */
 #define SPI_AF (GPIO_AF5)
 
 #define INT_PORT (GPIOC)
