@@ -993,7 +993,7 @@ uint8_t mcp2515_getInterrupts(const mcp2515_handle_t *mcp2515_handle)
   return readRegister(mcp2515_handle, MCP_CANINTF);
 }
 
-void mcp2515_clearInterrupts(const mcp2515_handle_t *mcp2515_handle)
+void mcp2515_clearALL_Interrupts(const mcp2515_handle_t *mcp2515_handle)
 {
   setRegister(mcp2515_handle, MCP_CANINTF, 0);
 }
@@ -1003,33 +1003,29 @@ uint8_t mcp2515_getInterruptMask(const mcp2515_handle_t *mcp2515_handle)
   return readRegister(mcp2515_handle, MCP_CANINTE);
 }
 
-void mcp2515_clearTXInterrupts(const mcp2515_handle_t *mcp2515_handle)
+void mcp2515_clearTXn_Interrupts(const mcp2515_handle_t *mcp2515_handle)
 {
   modifyRegister(mcp2515_handle, MCP_CANINTF, (CANINTF_TX0IF | CANINTF_TX1IF | CANINTF_TX2IF), 0);
 }
 
-void mcp2515_clearRXnOVR(const mcp2515_handle_t *mcp2515_handle)
+void mcp2515_clearRXn_Interrupt(const mcp2515_handle_t *mcp2515_handle)
 {
-  uint8_t eflg = mcp2515_getErrorFlags(mcp2515_handle);
-  if (eflg != 0)
-  {
-    mcp2515_clearRXnOVRFlags(mcp2515_handle);
-    mcp2515_clearInterrupts(mcp2515_handle);
-    // modifyRegister(MCP_CANINTF, CANINTF_ERRIF, 0);
-  }
+  // uint8_t eflg = mcp2515_getErrorFlags(mcp2515_handle);
+  // if (eflg != 0)
+  // {
+  //   mcp2515_clearRXnOVRFlags(mcp2515_handle);
+  //   mcp2515_clearInterrupts(mcp2515_handle);
+  // }
+  modifyRegister(mcp2515_handle, MCP_CANINTF, (CANINTF_RX0IF | CANINTF_RX1IF), 0);
 }
 
-void mcp2515_clearMERR(const mcp2515_handle_t *mcp2515_handle)
+void mcp2515_clearMERR_Interrupt(const mcp2515_handle_t *mcp2515_handle)
 {
-  // modifyRegister(MCP_EFLG, EFLG_RX0OVR | EFLG_RX1OVR, 0);
-  // mcp2515_clearInterrupts();
   modifyRegister(mcp2515_handle, MCP_CANINTF, CANINTF_MERRF, 0);
 }
 
-void mcp2515_clearERRIF(const mcp2515_handle_t *mcp2515_handle)
+void mcp2515_clearERRIF_Interrupt(const mcp2515_handle_t *mcp2515_handle)
 {
-  // modifyRegister(MCP_EFLG, EFLG_RX0OVR | EFLG_RX1OVR, 0);
-  // mcp2515_clearInterrupts();
   modifyRegister(mcp2515_handle, MCP_CANINTF, CANINTF_ERRIF, 0);
 }
 

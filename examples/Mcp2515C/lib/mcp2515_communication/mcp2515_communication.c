@@ -11,7 +11,7 @@
 void spi_setup(void);
 void int_pin_setup(void);
 
-void mcp2515_setup()
+void mcp2515_pin_setup()
 {
   spi_setup();
   int_pin_setup();
@@ -88,30 +88,30 @@ void mcp2515_delay_ms(uint32_t ms)
   }
 }
 
-void mcp2515_print_can_frame(can_frame_t can_frame)
+void mcp2515_print_can_frame(can_frame_t *can_frame)
 {
-  printf("%x ", can_frame.can_id);
-  printf("%x ", can_frame.can_dlc);
+  printf("%lx ", can_frame->can_id);
+  printf("%x ", can_frame->can_dlc);
   /* print the data */
-  for (int i = 0; i < can_frame.can_dlc; i++)
+  for (int i = 0; i < can_frame->can_dlc; i++)
   {
-    printf("%x ", can_frame.data[i]);
+    printf("%x ", can_frame->data[i]);
   }
   printf(" \r\n");
 }
 
-bool mcp2515_compare_frame(can_frame_t frame1, can_frame_t frame2)
+bool mcp2515_compare_frame(can_frame_t *frame1, can_frame_t *frame2)
 {
-  if (frame1.can_id == frame2.can_id &&
-      frame1.can_dlc == frame2.can_dlc &&
-      frame1.data[0] == frame2.data[0] &&
-      frame1.data[1] == frame2.data[1] &&
-      frame1.data[2] == frame2.data[2] &&
-      frame1.data[3] == frame2.data[3] &&
-      frame1.data[4] == frame2.data[4] &&
-      frame1.data[5] == frame2.data[5] &&
-      frame1.data[6] == frame2.data[6] &&
-      frame1.data[7] == frame2.data[7])
+  if (frame1->can_id == frame2->can_id &&
+      frame1->can_dlc == frame2->can_dlc &&
+      frame1->data[0] == frame2->data[0] &&
+      frame1->data[1] == frame2->data[1] &&
+      frame1->data[2] == frame2->data[2] &&
+      frame1->data[3] == frame2->data[3] &&
+      frame1->data[4] == frame2->data[4] &&
+      frame1->data[5] == frame2->data[5] &&
+      frame1->data[6] == frame2->data[6] &&
+      frame1->data[7] == frame2->data[7])
   {
     return true;
   }

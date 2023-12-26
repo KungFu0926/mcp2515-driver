@@ -150,19 +150,18 @@ ERROR mcp2515_readMessage(const mcp2515_handle_t *mcp2515_handle, can_frame_t *f
 bool mcp2515_checkReceive(const mcp2515_handle_t *mcp2515_handle);
 bool mcp2515_checkError(const mcp2515_handle_t *mcp2515_handle);
 
+uint8_t mcp2515_getStatus(const mcp2515_handle_t *mcp2515_handle);
+
 uint8_t mcp2515_getErrorFlags(const mcp2515_handle_t *mcp2515_handle);
 void mcp2515_clearRXnOVRFlags(const mcp2515_handle_t *mcp2515_handle);
 
 uint8_t mcp2515_getInterrupts(const mcp2515_handle_t *mcp2515_handle);
 uint8_t mcp2515_getInterruptMask(const mcp2515_handle_t *mcp2515_handle);
-void mcp2515_clearInterrupts(const mcp2515_handle_t *mcp2515_handle);
-void mcp2515_clearTXInterrupts(const mcp2515_handle_t *mcp2515_handle);
-
-uint8_t mcp2515_getStatus(const mcp2515_handle_t *mcp2515_handle);
-
-void mcp2515_clearRXnOVR(const mcp2515_handle_t *mcp2515_handle);
-void mcp2515_clearMERR(const mcp2515_handle_t *mcp2515_handle);
-void mcp2515_clearERRIF(const mcp2515_handle_t *mcp2515_handle);
+void mcp2515_clearALL_Interrupts(const mcp2515_handle_t *mcp2515_handle);
+void mcp2515_clearTXn_Interrupts(const mcp2515_handle_t *mcp2515_handle);
+void mcp2515_clearRXn_Interrupt(const mcp2515_handle_t *mcp2515_handle);
+void mcp2515_clearMERR_Interrupt(const mcp2515_handle_t *mcp2515_handle);
+void mcp2515_clearERRIF_Interrupt(const mcp2515_handle_t *mcp2515_handle);
 
 uint8_t mcp2515_errorCountRX(const mcp2515_handle_t *mcp2515_handle);
 uint8_t mcp2515_errorCountTX(const mcp2515_handle_t *mcp2515_handle);

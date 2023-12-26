@@ -29,7 +29,7 @@
 #define INT_EXTI (EXTI7)
 #define INT_IRQ (NVIC_EXTI9_5_IRQ)
 
-void mcp2515_setup(void);
+void mcp2515_pin_setup(void);
 bool mcp2515_init(const mcp2515_handle_t *mcp2515_handle);
 
 void mcp2515_deselect(void);
@@ -37,8 +37,8 @@ void mcp2515_select(void);
 uint8_t mcp2515_spi_transfer(uint8_t data);
 void mcp2515_delay_ms(uint32_t ms);
 
-void mcp2515_print_can_frame(can_frame_t can_frame);
-bool mcp2515_compare_frame(can_frame_t frame1, can_frame_t frame2);
+void mcp2515_print_can_frame(can_frame_t *can_frame);
+bool mcp2515_compare_frame(can_frame_t *frame1, can_frame_t *frame2);
 
 extern can_frame_t tx_frame_1;
 extern can_frame_t tx_frame_2;
