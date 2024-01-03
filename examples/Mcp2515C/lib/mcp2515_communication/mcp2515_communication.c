@@ -122,16 +122,13 @@ bool mcp2515_compare_frame(can_frame_t *frame1, can_frame_t *frame2)
 }
 
 can_frame_t tx_frame_1 = {
-    .can_id = 0x01,
-    .can_dlc = 8,
-    .data[0] = 0x01,
-    .data[1] = 0x02,
-    .data[2] = 0x03,
-    .data[3] = 0x04,
-    .data[4] = 0x55,
-    .data[5] = 0x66,
-    .data[6] = 0x77,
-    .data[7] = 0x08,
+    .can_id = 0x81,
+    .can_dlc = 5,
+    .data[0] = 0xBE,  // 1 011 1110
+    .data[1] = 0xDB,  // 1 10 1 10 11
+    .data[2] = 0x80,
+    .data[3] = 0x80,
+    .data[4] = 0x80,
 };
 can_frame_t tx_frame_2 = {
     .can_id = 0x002,

@@ -4,8 +4,8 @@
  * @author ZhengKF (minchen9292@gmail.com)
  */
 /* SELECT MODE */
-// #define SEND_MODE
-#define READ_MODE
+#define SEND_MODE
+// #define READ_MODE
 // #define IRQ_MODE
 // #define TEST_MODE
 
@@ -45,10 +45,11 @@ int main(void)
       printf(" \r\n");
     }
     mcp2515_sendMessage(&mcp2515, &tx_frame_1);
-    mcp2515_print_can_frame(tx_frame_1);
+    mcp2515_print_can_frame(&tx_frame_1);
+    mcp2515_delay_ms(1);
     mcp2515_clearTXn_Interrupts(&mcp2515);
 
-    delay(3, S);
+    delay(2, S);
 
     SendTimes += 1;
 #elif defined(READ_MODE)
