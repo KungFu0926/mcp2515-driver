@@ -30,6 +30,7 @@ void rcc_setup(void);
 void led_setup(void);
 void timer4_setup(void);
 void usart2_setup(void);
+void onboard_button_setup(void);
 
 void default_mode_start_up()
 {
@@ -38,6 +39,7 @@ void default_mode_start_up()
   led_setup();
   swo_enable();
   usart2_setup();
+  onboard_button_setup();
 }
 
 void rcc_setup(void)
@@ -53,13 +55,13 @@ void rcc_setup(void)
   rcc_periph_clock_enable(RCC_GPIOA);
   rcc_periph_clock_enable(RCC_GPIOB);
   rcc_periph_clock_enable(RCC_GPIOC);
-
-  rcc_periph_clock_enable(RCC_TIM4);
-  rcc_periph_reset_pulse(RST_TIM4); /* Reset TIM4 to defaults. */
 }
 
 void timer4_setup(void)
 {
+  rcc_periph_clock_enable(RCC_TIM4);
+  rcc_periph_reset_pulse(RST_TIM4); /* Reset TIM4 to defaults. */
+
   timer_set_mode(TIM4,
                  TIM_CR1_CKD_CK_INT,
                  TIM_CR1_CMS_EDGE,
@@ -188,7 +190,6 @@ void itm_setup()
   ITM_TPR |= (0x1 << 0);
 }
 
-
 /*
   For printf().
   Will emit message to swo and usart2
@@ -284,8 +285,13 @@ void delay(uint32_t value, delayUnit unit)
   }
 }
 
-
-
+void onboard_button_setup(void)
+{
+  gpio_mode_setup(GPIOC,
+                  GPIO_MODE_INPUT,
+                  GPIO_PUPD_NONE,
+                  GPIO13);
+}
 /*-----------------------------unuse---------------------------------*/
 // #define ETM_BASE (PPBI_BASE + 0x41000)
 // #define ETM_CR MMIO32(ETM_BASE + 0x000)
