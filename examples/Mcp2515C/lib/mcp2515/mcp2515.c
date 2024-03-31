@@ -1008,15 +1008,14 @@ void mcp2515_clearTXn_Interrupts(const mcp2515_handle_t *mcp2515_handle)
   modifyRegister(mcp2515_handle, MCP_CANINTF, (CANINTF_TX0IF | CANINTF_TX1IF | CANINTF_TX2IF), 0);
 }
 
-void mcp2515_clearRXn_Interrupt(const mcp2515_handle_t *mcp2515_handle)
+void mcp2515_clearRXnOVR_Flags_and_Interrupt(const mcp2515_handle_t *mcp2515_handle)
 {
-  // uint8_t eflg = mcp2515_getErrorFlags(mcp2515_handle);
-  // if (eflg != 0)
-  // {
-  //   mcp2515_clearRXnOVRFlags(mcp2515_handle);
-  //   mcp2515_clearInterrupts(mcp2515_handle);
-  // }
-  modifyRegister(mcp2515_handle, MCP_CANINTF, (CANINTF_RX0IF | CANINTF_RX1IF), 0);
+  uint8_t eflg = mcp2515_getErrorFlags(mcp2515_handle);
+  if (eflg != 0)
+  {
+    mcp2515_clearRXnOVRFlags(mcp2515_handle);
+    mcp2515_clearALL_Interrupts(mcp2515_handle);
+  }
 }
 
 void mcp2515_clearMERR_Interrupt(const mcp2515_handle_t *mcp2515_handle)

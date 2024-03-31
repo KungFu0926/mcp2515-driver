@@ -142,24 +142,25 @@ ERROR mcp2515_setClkOut(const mcp2515_handle_t *mcp2515_handle, const CAN_CLKOUT
 ERROR mcp2515_setBitrate(const mcp2515_handle_t *mcp2515_handle, const CAN_SPEED canSpeed, const CAN_CLOCK canClock);
 ERROR mcp2515_setFilterMask(const mcp2515_handle_t *mcp2515_handle, const MASK num, const bool ext, const uint32_t ulData);
 ERROR mcp2515_setFilter(const mcp2515_handle_t *mcp2515_handle, const RXF num, const bool ext, const uint32_t ulData);
-ERROR mcp2515_sendMessage_TXBn(const mcp2515_handle_t *mcp2515_handle, const TXBn txbn, const can_frame_t *frame);
-ERROR mcp2515_sendMessage(const mcp2515_handle_t *mcp2515_handle, const can_frame_t *frame);
-ERROR mcp2515_readMessage_RXBn(const mcp2515_handle_t *mcp2515_handle, const RXBn rxbn, can_frame_t *frame);
-ERROR mcp2515_readMessage(const mcp2515_handle_t *mcp2515_handle, can_frame_t *frame);
+
+
+ERROR mcp2515_sendMessage_TXBn(const mcp2515_handle_t *mcp2515_handle, const TXBn txbn, const struct can_frame *frame);
+ERROR mcp2515_sendMessage(const mcp2515_handle_t *mcp2515_handle, const struct can_frame *frame);
+ERROR mcp2515_readMessage_RXBn(const mcp2515_handle_t *mcp2515_handle, const RXBn rxbn, struct can_frame *frame);
+ERROR mcp2515_readMessage(const mcp2515_handle_t *mcp2515_handle, struct can_frame *frame);
 
 bool mcp2515_checkReceive(const mcp2515_handle_t *mcp2515_handle);
 bool mcp2515_checkError(const mcp2515_handle_t *mcp2515_handle);
-
-uint8_t mcp2515_getStatus(const mcp2515_handle_t *mcp2515_handle);
-
 uint8_t mcp2515_getErrorFlags(const mcp2515_handle_t *mcp2515_handle);
 void mcp2515_clearRXnOVRFlags(const mcp2515_handle_t *mcp2515_handle);
-
 uint8_t mcp2515_getInterrupts(const mcp2515_handle_t *mcp2515_handle);
 uint8_t mcp2515_getInterruptMask(const mcp2515_handle_t *mcp2515_handle);
 void mcp2515_clearALL_Interrupts(const mcp2515_handle_t *mcp2515_handle);
 void mcp2515_clearTXn_Interrupts(const mcp2515_handle_t *mcp2515_handle);
-void mcp2515_clearRXn_Interrupt(const mcp2515_handle_t *mcp2515_handle);
+uint8_t mcp2515_getStatus(const mcp2515_handle_t *mcp2515_handle);
+
+void mcp2515_clearRXnOVR_Flags_and_Interrupt(const mcp2515_handle_t *mcp2515_handle);
+
 void mcp2515_clearMERR_Interrupt(const mcp2515_handle_t *mcp2515_handle);
 void mcp2515_clearERRIF_Interrupt(const mcp2515_handle_t *mcp2515_handle);
 
