@@ -18,8 +18,9 @@
 // #define TIMER4_PRESCALOR (84)                    //舊版，除頻後頻率約為2MHz
 #define TIMER4_PRESCALOR (1)  // 新版，除頻後頻率為1MHz
 #define TIMER4_ARR (42 - 1)   // 根據除頻頻率，舊版2us會中斷一次。新版1us會中斷一次
+
 #define TIMER7_PRESCALER (420 - 1)
-#define TIMER7_ARR (10000 - 1)  // 根據除頻頻率，新版為100ms會中斷一次
+#define TIMER7_ARR (20000 - 1)  // 根據除頻頻率，新版為100ms會中斷一次
 
 /*--------------------Here for SWO_setup----------------------*/
 void swo_enable(void);

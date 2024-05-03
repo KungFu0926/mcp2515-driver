@@ -41,6 +41,11 @@ extern volatile uint32_t counter;
 
 // volatile uint32_t counter = 0;
 
+/**
+ * @brief Timer4 Interrupt service routine.
+ * 每1us執行一次
+ */
+
 // void tim4_isr(void)
 // {
 //   /* Check 'Update interrupt flag'. */
@@ -53,6 +58,7 @@ extern volatile uint32_t counter;
 
 // /**
 //  * @brief Timer7 Interrupt service routine.
+//  * 每100ms執行一次
 //  */
 // void tim7_isr(void)
 // {
