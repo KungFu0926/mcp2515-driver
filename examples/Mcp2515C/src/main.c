@@ -4,8 +4,8 @@
  * @author ZhengKF (minchen9292@gmail.com)
  */
 /* SELECT MODE */
-#define SEND_MODE
-// #define READ_MODE
+// #define SEND_MODE
+#define READ_MODE
 // #define IRQ_MODE
 // #define TEST_MODE
 
@@ -19,6 +19,7 @@
 #include "mcp2515.h"
 #include "mcp2515_communication.h"
 #include "default_mode.h"
+
 
 mcp2515_handle_t mcp2515;
 can_frame_t Receieve_frame;

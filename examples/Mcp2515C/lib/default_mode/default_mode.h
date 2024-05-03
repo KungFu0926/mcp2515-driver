@@ -19,6 +19,8 @@
   #define GPIO_LED_PORT (GPIOA)
   #define GPIO_LED_PIN (GPIO5) /* D13. */
 
+  #define ON_BOARD_BUTTON_PORT (GPIOC)
+  #define ON_BOARD_BUTTON_PIN (GPIO13)
 typedef enum
 {
   S,
@@ -46,5 +48,17 @@ extern volatile uint32_t counter;
 //   if (timer_get_flag(TIM4, TIM_SR_UIF))
 //   {
 //     timer_clear_flag(TIM4, TIM_SR_UIF);
+//   }
+// }
+
+// /**
+//  * @brief Timer1 Interrupt service routine.
+//  */
+// void tim2_isr(void)
+// {
+//   if (timer_get_flag(TIM2, TIM_SR_UIF))
+//   {
+//     timer_clear_flag(TIM2, TIM_SR_UIF);
+//     // gpio_toggle(GPIO_LED_PORT, GPIO_LED_PIN); /* LED on/off. */
 //   }
 // }

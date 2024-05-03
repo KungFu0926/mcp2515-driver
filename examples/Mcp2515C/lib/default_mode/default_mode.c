@@ -15,8 +15,12 @@
 #define USART_BAUDRATE (115200)
 
 #define ORIGINAL_TIMER4_CLOCK (rcc_apb1_frequency * 2)  //  84MHZ
-#define TIMER4_PRESCALER (84)                           // clock is devided into 1MHZ.1sec happen 1M times
-#define TIMER4_ARR (1)                                  // Mean it will generate a overflow when system finish one time.
+// #define TIMER4_PRESCALER (84)                           // clock is devided into 1MHZ.1sec happen 1M times
+#define TIMER4_PRESCALER (21 - 1)  // clock is devided into 1MHZ.1sec happen 1M times
+#define TIMER4_ARR (1)             // Mean it will generate a overflow when system finish one time.
+
+#define TIMER2_PRESCALER (8400 - 1)
+#define TIMER2_ARR (1000 - 1)  // 根據除頻頻率，新版為100ms會中斷一次
 
 /*--------------------Here for SWO_setup----------------------*/
 void swo_enable(void);
@@ -28,6 +32,7 @@ void itm_setup(void);
 /*--------------------Here for common tools---------------------*/
 void rcc_setup(void);
 void led_setup(void);
+void timer2_setup(void);
 void timer4_setup(void);
 void usart2_setup(void);
 void onboard_button_setup(void);
@@ -35,6 +40,7 @@ void onboard_button_setup(void);
 void default_mode_start_up()
 {
   rcc_setup();
+  timer2_setup();
   timer4_setup();
   led_setup();
   swo_enable();
@@ -55,6 +61,25 @@ void rcc_setup(void)
   rcc_periph_clock_enable(RCC_GPIOA);
   rcc_periph_clock_enable(RCC_GPIOB);
   rcc_periph_clock_enable(RCC_GPIOC);
+}
+
+void timer2_setup(void)
+{
+  /* FOR setting timer 2 */
+  rcc_periph_clock_enable(RCC_TIM2);
+  rcc_periph_reset_pulse(RST_TIM2); /* Reset TIM2 to defaults. */
+
+  timer_set_mode(TIM2, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
+  timer_disable_preload(TIM2);
+  timer_continuous_mode(TIM2);
+  timer_set_prescaler(TIM2, TIMER2_PRESCALER);  // 因為這個部分再timer4設定過了，這是要將apb的頻率除頻的部分
+  timer_set_period(TIM2, TIMER2_ARR);           /* Setup TIMx_ARR register. */
+
+  /* Setup interrupt. */
+  timer_enable_irq(TIM2, TIM_DIER_UIE); /* Select 'UI (Update interrupt)'. */
+  nvic_enable_irq(NVIC_TIM2_IRQ);
+
+  timer_enable_counter(TIM2);
 }
 
 void timer4_setup(void)
