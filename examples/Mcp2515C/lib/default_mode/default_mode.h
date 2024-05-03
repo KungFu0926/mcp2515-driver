@@ -37,7 +37,7 @@ void delay(uint32_t value, delayUnit unit);
 extern volatile uint32_t counter;
 #endif
 
-/*------------------------- below is timer4_delay -------------------------*/
+/*------------------ below is timer4(for delay,resolutin 1us) and timer7 (for timepass counter, resolution 100ms )------------------*/
 
 // volatile uint32_t counter = 0;
 
@@ -52,13 +52,13 @@ extern volatile uint32_t counter;
 // }
 
 // /**
-//  * @brief Timer1 Interrupt service routine.
+//  * @brief Timer7 Interrupt service routine.
 //  */
-// void tim2_isr(void)
+// void tim7_isr(void)
 // {
-//   if (timer_get_flag(TIM2, TIM_SR_UIF))
+//   if (timer_get_flag(TIM7, TIM_SR_UIF))
 //   {
-//     timer_clear_flag(TIM2, TIM_SR_UIF);
+//     timer_clear_flag(TIM7, TIM_SR_UIF);
 //     // gpio_toggle(GPIO_LED_PORT, GPIO_LED_PIN); /* LED on/off. */
 //   }
 // }
